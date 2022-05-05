@@ -17,14 +17,26 @@ document.addEventListener('data-loaded', ({ detail }) => {
     loadAndProcessGlobeData();
 })
 
-document.addEventListener('data-selects-changed', ({ detail }) => {
-    state.chosenDataFile = detail.chosenDataFile;;
-    loadAndProcessGlobeData();
-})
 
 
 document.addEventListener('local-selects-changed', (changedData) => {
     updateView();
+})
+
+d3.select('data-select').on('change', () => {
+    const chosenDataFile = d3.select('.data-select').node().value;
+    state.chosenDataFile = chosenDataFile;;
+    loadAndProcessGlobeData();
+})
+
+d3.select('theme-select').on('change', () => {
+    state.chosenTheme = d3.select('.theme-select').node().value;
+    updateView()
+})
+
+d3.select('base-map-select').on('change', () => {
+    state.chosenBaseMap = d3.select('.base-map-select').node().value;
+    updateView()
 })
 
 
@@ -39,23 +51,36 @@ function loadAndProcessGlobeData() {
 
 function populateDropDowns({ mapData }) {
     state.chosenDataFile = mapData[0].dataFile;
+    // state.chosenTheme...
+    // state.chosenBaseMap...
+
     // Fill DropDowns
+    // d3.select('.data-select').html(`options...`)
+
+
+    // Add Choices for all selects 
+    
+    /* 
+       d3.selectAll('.dropdown').each(function(this)=>{
+           this._choice =  new Choice(this)...
+       })
+    */
+    
 }
 
 function updateView() {
-    retrieveValues();
     setNewData()
     setLegend()
 }
 
 function setNewData() {
+   // It's on me to implement this,
+   
+   // Generating BASE 64 IMG
 
-}
+   // Updating Globe
 
-
-function retrieveValues() {
-    //  state.chosenTheme = d3.select('.data-chosen-theme').node().value;
-
+   // Setting state extent ...
 }
 
 
