@@ -1,0 +1,11 @@
+.color-legend-container {
+    width: 330px;
+    height: 31px;
+    background-color: white;
+    left: 20px;
+    bottom: 20px;
+    position: absolute;
+    border-radius: 5px;;
+    padding:20px;
+    padding-top:10px;
+}
