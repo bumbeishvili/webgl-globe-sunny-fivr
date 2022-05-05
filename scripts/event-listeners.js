@@ -1,4 +1,4 @@
-import { data } from './data.js';
+import { data } from './main.js';
 import { Legend } from './legend.d3.js';
 
 
@@ -74,7 +74,7 @@ function updateView() {
 }
 
 function setNewData() {
-   // It's on me to implement this,
+   // It's on me to implement this function
    
    // Generating BASE 64 IMG
 
