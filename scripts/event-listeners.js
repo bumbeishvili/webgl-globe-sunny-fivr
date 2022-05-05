@@ -1,4 +1,5 @@
 import { data } from './main.js';
+import {globe} from './globe.js';
 import { Legend } from './legend.d3.js';
 
 
@@ -61,7 +62,7 @@ function populateDropDowns({ mapData }) {
     // Add Choices for all selects 
     
     /* 
-       d3.selectAll('.dropdown').each(function(this)=>{
+       d3.selectAll('.dropdown').each(function()=>{
            this._choice =  new Choice(this)...
        })
     */
