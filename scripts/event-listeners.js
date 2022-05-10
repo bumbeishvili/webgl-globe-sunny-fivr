@@ -43,7 +43,7 @@ d3.select('base-map-select').on('change', () => {
 
 
 function loadAndProcessGlobeData() {
-    d3.csv('/data/' + state.chosenDataFile).then(csvData => {
+    d3.csv('./data/' + state.chosenDataFile).then(csvData => {
         state.currentDataset = csvData;
         updateView();
     })
