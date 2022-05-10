@@ -1,5 +1,5 @@
 import { data } from './main.js';
-import {globe} from './globe.js';
+import { globe } from './globe.js';
 import { Legend } from './legend.d3.js';
 
 
@@ -60,13 +60,13 @@ function populateDropDowns({ mapData }) {
 
 
     // Add Choices for all selects 
-    
+
     /* 
        d3.selectAll('.dropdown').each(function()=>{
            this._choice =  new Choice(this)...
        })
     */
-    
+
 }
 
 function updateView() {
@@ -74,14 +74,46 @@ function updateView() {
     setLegend()
 }
 
+function toDataURL(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        var reader = new FileReader();
+        reader.onloadend = function () {
+            callback(reader.result);
+        }
+        reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
+}
+
+
+
 function setNewData() {
-   // It's on me to implement this function
-   
-   // Generating BASE 64 IMG
 
-   // Updating Globe
 
-   // Setting state extent ...
+    toDataURL('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg', function (dataUrl) {
+        console.log('RESULT:', dataUrl)
+        globe.globeImageUrl(dataUrl);
+    })
+    // const image = new Image();
+    // image.src = "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg";
+    // image.onload = () => {
+    //     globe.globeImageUrl(image);
+    // }
+    // console.log('setting data', state)
+
+    // globe.globeImageUrl(
+    //     "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+    // )
+    // It's on me to implement this function
+
+    // Generating BASE 64 IMG
+
+    // Updating Globe
+
+    // Setting state extent ...
 }
 
 
