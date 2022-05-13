@@ -9,11 +9,27 @@
   <script src="https://unpkg.com/globe.gl@2.26.1/dist/globe.gl.min.js"></script>
   <script src="https://unpkg.com/d3@7.4.4/dist/d3.min.js"></script>
   <link  rel="stylesheet" href="style.css" ></link>
+  <script src="choices.min.js"></script>
+  <link rel="stylesheet" href="choices.min.css" />
 
-  <!--    <script src="../../dist/globe.gl.js"></script>-->
+   <!--    <script src="../../dist/globe.gl.js"></script>-->
 </head>
 
 <body>
+  <div class="filters">
+    <div class="dropdown">
+      <span class="dropdown-label">Data</span>
+      <select class="dropdown-select data-select"  id="data_sel"></select>
+    </div>
+    <div class="dropdown">
+      <span class="dropdown-label">Color</span>
+      <select class="dropdown-select color-select" id="color_sel"></select>
+    </div>
+    <div class="dropdown">
+      <span class="dropdown-label">Basemap</span>
+      <select class="dropdown-select basemap-select" id="basemap_sel"></select>
+    </div>
+    </div>
   <div id="globeViz"></div>
   <div class="color-legend-container"></div>
   <script type="module" src="scripts/globe.js"></script>
