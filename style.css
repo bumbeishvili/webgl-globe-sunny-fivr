@@ -9,6 +9,7 @@
   padding: 20px;
   padding-top: 10px;
 }
+
 select {
   width: 230px;
   height: 0px;
@@ -21,15 +22,19 @@ select {
 
 .dropdown {
   margin-bottom: 20px;
+  margin-top:5px;
   width: 100%;
 }
+
 .dropdown-label {
   color: white;
-  padding-bottom: 3px;
+  padding-bottom: 5px;
 }
+
+
 .filters {
   display: flex;
-  width: 230px;
+  width: 260px;
   background-color: #152035;
   padding: 20px;
   position: absolute;
@@ -40,5 +45,24 @@ select {
   left: 15px;
   top: 15px;
   max-height: calc(100vh - 80px);
-  overflow-y: scroll;
+  overflow-y: visible;
+}
+
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.choices{
+  margin-top:5px;
+}
+
+.choices__inner {
+  width: calc(100% - 20px) !important;
+  padding-bottom: 3.5px !important;
+}
+
+.choices__item{
+  padding-right:20px !important;
+  
 }
