@@ -13,8 +13,40 @@ const state = {
 document.addEventListener("data-loaded", ({ detail }) => {
   populateDropDowns(detail);
   loadAndProcessGlobeData();
+  onArrowClick();
 });
 
+function onArrowClick() {
+  document.addEventListener("keydown", function (event) {
+    console.log(event.keyCode);
+    switch (event.keyCode) {
+      case 37:
+        //left
+        break;
+      case 38:
+        //up
+        console.log(data.dataFIlesArray);
+        console.log(state.chosenDataFile);
+        if (data.dataFilesArray.indexOf(state.chosenDataFile) > 0) {
+          state.chosenDataFile =
+            data.mapData[
+              data.dataFilesArray.indexOf(state.chosenDataFile) - 1
+            ].dataFile;
+
+          console.log(state.chosenDataFile);
+        } else {
+          console.log(state.chosenDataFile);
+        }
+        break;
+      case 39:
+        //right
+        break;
+      case 40:
+        //down
+        break;
+    }
+  });
+}
 document.addEventListener("local-selects-changed", (changedData) => {
   updateView();
 });
@@ -166,4 +198,8 @@ function setLegend() {
   );
 }
 
-export { state };
+function openLink() {
+  console.log(data);
+  window.open(data.config[0].value, "_blank");
+}
+export { state, openLink };
