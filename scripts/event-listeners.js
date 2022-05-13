@@ -11,7 +11,6 @@ const state = {
 };
 
 document.addEventListener("data-loaded", ({ detail }) => {
-  console.log({ detail });
   populateDropDowns(detail);
   loadAndProcessGlobeData();
 });
@@ -20,19 +19,20 @@ document.addEventListener("local-selects-changed", (changedData) => {
   updateView();
 });
 
-d3.select("data-select").on("change", () => {
+d3.select(".data-select").on("change", () => {
   const chosenDataFile = d3.select(".data-select").node().value;
   state.chosenDataFile = chosenDataFile;
   loadAndProcessGlobeData();
 });
 
-d3.select("theme-select").on("change", () => {
+d3.select(".theme-select").on("change", () => {
   state.chosenTheme = d3.select(".theme-select").node().value;
   updateView();
 });
 
-d3.select("base-map-select").on("change", () => {
+d3.select(".base-map-select").on("change", () => {
   state.chosenBaseMap = d3.select(".base-map-select").node().value;
+  console.log(state.chosenBaseMap);
   updateView();
 });
 
@@ -44,8 +44,6 @@ function loadAndProcessGlobeData() {
 }
 
 function populateDropDowns(detail) {
-  console.log({ detail });
-
   state.chosenDataFile = detail.mapData[0].dataFile;
   state.chosenTheme = detail.mapData[0].colors;
   state.chosenBaseMap = detail.mapData[0].baseMap;
@@ -73,8 +71,8 @@ function populateDropDowns(detail) {
   });
   // d3.select('.data-select').html(`options...`)
   d3.select(".data-select").html(`${dataFilesOptions}`);
-  d3.select(".color-select").html(`${themesOptions}`);
-  d3.select(".basemap-select").html(`${baseMapOptions}`);
+  d3.select(".theme-select").html(`${themesOptions}`);
+  d3.select(".base-map-select").html(`${baseMapOptions}`);
 
   // Add Choices for all selects
 
@@ -143,10 +141,44 @@ function updateView() {
   setLegend();
 }
 
+function toDataURL(url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function () {
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      callback(reader.result);
+    };
+    reader.readAsDataURL(xhr.response);
+  };
+  xhr.open("GET", url);
+  xhr.responseType = "blob";
+  xhr.send();
+}
+
 function setNewData() {
+  toDataURL(
+    "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+    function (dataUrl) {
+      console.log("RESULT:", dataUrl);
+      globe.globeImageUrl(dataUrl);
+    }
+  );
+  // const image = new Image();
+  // image.src = "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg";
+  // image.onload = () => {
+  //     globe.globeImageUrl(image);
+  // }
+  // console.log('setting data', state)
+
+  // globe.globeImageUrl(
+  //     "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+  // )
   // It's on me to implement this function
+
   // Generating BASE 64 IMG
+
   // Updating Globe
+
   // Setting state extent ...
 }
 
