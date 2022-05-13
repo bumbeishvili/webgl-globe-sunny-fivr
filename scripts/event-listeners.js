@@ -69,30 +69,8 @@ function populateDropDowns(detail) {
       label: d.name,
     };
   });
-  // d3.select('.data-select').html(`options...`)
-  d3.select(".data-select").html(`${dataFilesOptions}`);
-  d3.select(".theme-select").html(`${themesOptions}`);
-  d3.select(".base-map-select").html(`${baseMapOptions}`);
 
   // Add Choices for all selects
-
-  /* 
-       d3.selectAll('.dropdown').each(function()=>{
-           this._choice =  new Choice(this)...
-       })
-    */
-
-  // d3.selectAll(".dropdown-select").each(function () {
-  //   console.log(this);
-  //   this._choice = new Choices(this, {
-  //     choices: dataFilesOptions,
-  //     position: "bottom",
-  //     shouldSort: false,
-  //     itemSelectText: "",
-  //     placeholder: false,
-  //     searchEnabled: false,
-  //   });
-  // });
 
   const dataSelect = document.querySelector("#data_sel");
   const colorSelect = document.querySelector("#color_sel");
@@ -103,9 +81,7 @@ function populateDropDowns(detail) {
     position: "bottom",
     shouldSort: false,
     itemSelectText: "",
-    placeholder: true,
-    placeholderValue: "hggh",
-    searchEnabled: false,
+    searchEnabled: true,
   });
 
   const colorChoice = new Choices(colorSelect, {
@@ -113,18 +89,14 @@ function populateDropDowns(detail) {
     position: "bottom",
     shouldSort: false,
     itemSelectText: "",
-    placeholder: true,
-    placeholderValue: "hj",
-    searchEnabled: false,
+    searchEnabled: true,
   });
   const baseMapChoice = new Choices(baseMapSelect, {
     choices: baseMapOptions,
     position: "bottom",
     shouldSort: false,
     itemSelectText: "",
-    placeholder: true,
-    placeholderValue: "ghg",
-    searchEnabled: false,
+    searchEnabled: true,
   });
 
   dataSelect.addEventListener(
