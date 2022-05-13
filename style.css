@@ -59,8 +59,10 @@ body {
 
 .choices__inner {
   width: calc(100% - 20px) !important;
+  padding-bottom: 3.5px !important;
 }
 
 .choices__item{
   padding-right:20px !important;
+  
 }
