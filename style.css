@@ -34,7 +34,7 @@ select {
 
 .filters {
   display: flex;
-  width: 230px;
+  width: 260px;
   background-color: #152035;
   padding: 20px;
   position: absolute;
@@ -59,4 +59,8 @@ body {
 
 .choices__inner {
   width: calc(100% - 20px) !important;
+}
+
+.choices__item{
+  padding-right:20px !important;
 }
