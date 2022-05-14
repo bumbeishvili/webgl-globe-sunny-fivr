@@ -18,31 +18,62 @@ document.addEventListener("data-loaded", ({ detail }) => {
 
 function onArrowClick() {
   document.addEventListener("keydown", function (event) {
-    console.log(event.keyCode);
     switch (event.keyCode) {
       case 37:
         //left
+        //    console.log(data.colorsArray);
+        console.log(data.colorsValueArray.indexOf(state.chosenTheme));
+        if (data.colorsValueArray.indexOf(state.chosenTheme) > 0) {
+          state.chosenTheme =
+            data.colors[
+              data.colorsValueArray.indexOf(state.chosenTheme) - 1
+            ].value;
+          console.log(state.chosenTheme);
+        }
+        updateView();
         break;
       case 38:
         //up
-        console.log(data.dataFIlesArray);
-        console.log(state.chosenDataFile);
         if (data.dataFilesArray.indexOf(state.chosenDataFile) > 0) {
           state.chosenDataFile =
             data.mapData[
               data.dataFilesArray.indexOf(state.chosenDataFile) - 1
             ].dataFile;
-
-          console.log(state.chosenDataFile);
-        } else {
           console.log(state.chosenDataFile);
         }
+
+        loadAndProcessGlobeData();
+
         break;
       case 39:
         //right
+        if (
+          data.colorsValueArray.indexOf(state.chosenTheme) <
+          data.colorsValueArray.length - 1
+        ) {
+          state.chosenTheme =
+            data.colors[
+              data.colorsValueArray.indexOf(state.chosenTheme) + 1
+            ].value;
+          console.log(state.chosenTheme);
+        }
+        updateView();
         break;
       case 40:
         //down
+        if (
+          data.dataFilesArray.indexOf(state.chosenDataFile) <
+          data.dataFilesArray.length - 1
+        ) {
+          state.chosenDataFile =
+            data.mapData[
+              data.dataFilesArray.indexOf(state.chosenDataFile) + 1
+            ].dataFile;
+          console.log(state.chosenDataFile);
+        }
+
+        loadAndProcessGlobeData();
+
         break;
     }
   });
@@ -77,7 +108,8 @@ function loadAndProcessGlobeData() {
 
 function populateDropDowns(detail) {
   state.chosenDataFile = detail.mapData[0].dataFile;
-  state.chosenTheme = detail.mapData[0].colors;
+  state.chosenTheme =
+    data.colors[data.colorsNameArray.indexOf(detail.mapData[0].colors)].value;
   state.chosenBaseMap = detail.mapData[0].baseMap;
 
   // Fill DropDowns
@@ -131,10 +163,10 @@ function populateDropDowns(detail) {
     searchEnabled: true,
   });
 
-  dataSelect.addEventListener(
+  colorSelect.addEventListener(
     "change",
     function (event) {
-      console.log(event.detail.value);
+      console.log(event);
     },
     false
   );

@@ -3,7 +3,9 @@ const data = {
   config: [],
   colors: [],
   baseMaps: [],
-  dataFIlesArray: [],
+  dataFilesArray: [],
+  colorsValueArray: [],
+  colorsNameArray: [],
 };
 
 Promise.all([
@@ -26,7 +28,13 @@ Promise.all([
   data.baseMaps = baseMaps;
 
   mapData.forEach((element) => {
-    data.dataFIlesArray.push(element.dataFile);
+    data.dataFilesArray.push(element.dataFile);
+  });
+  colors.forEach((element) => {
+    data.colorsValueArray.push(element.value);
+  });
+  colors.forEach((element) => {
+    data.colorsNameArray.push(element.name);
   });
   document.dispatchEvent(
     new CustomEvent("data-loaded", {
