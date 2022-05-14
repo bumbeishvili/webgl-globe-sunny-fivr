@@ -10,74 +10,30 @@ const state = {
   currentDataset: null,
 };
 
+var dataChoice;
+var colorChoice;
 document.addEventListener("data-loaded", ({ detail }) => {
   populateDropDowns(detail);
   loadAndProcessGlobeData();
-  onArrowClick();
 });
 
-function onArrowClick() {
-  document.addEventListener("keydown", function (event) {
-    switch (event.keyCode) {
-      case 37:
-        //left
-        //    console.log(data.colorsArray);
-        console.log(data.colorsValueArray.indexOf(state.chosenTheme));
-        if (data.colorsValueArray.indexOf(state.chosenTheme) > 0) {
-          state.chosenTheme =
-            data.colors[
-              data.colorsValueArray.indexOf(state.chosenTheme) - 1
-            ].value;
-          console.log(state.chosenTheme);
-        }
-        updateView();
-        break;
-      case 38:
-        //up
-        if (data.dataFilesArray.indexOf(state.chosenDataFile) > 0) {
-          state.chosenDataFile =
-            data.mapData[
-              data.dataFilesArray.indexOf(state.chosenDataFile) - 1
-            ].dataFile;
-          console.log(state.chosenDataFile);
-        }
+document.addEventListener("keydown", function (event) {
+  switch (event.keyCode) {
+    case 37:
+      leftArrow();
+      break;
+    case 38:
+      upArrow();
+      break;
+    case 39:
+      rightArrow();
+      break;
+    case 40:
+      downArrow();
+      break;
+  }
+});
 
-        loadAndProcessGlobeData();
-
-        break;
-      case 39:
-        //right
-        if (
-          data.colorsValueArray.indexOf(state.chosenTheme) <
-          data.colorsValueArray.length - 1
-        ) {
-          state.chosenTheme =
-            data.colors[
-              data.colorsValueArray.indexOf(state.chosenTheme) + 1
-            ].value;
-          console.log(state.chosenTheme);
-        }
-        updateView();
-        break;
-      case 40:
-        //down
-        if (
-          data.dataFilesArray.indexOf(state.chosenDataFile) <
-          data.dataFilesArray.length - 1
-        ) {
-          state.chosenDataFile =
-            data.mapData[
-              data.dataFilesArray.indexOf(state.chosenDataFile) + 1
-            ].dataFile;
-          console.log(state.chosenDataFile);
-        }
-
-        loadAndProcessGlobeData();
-
-        break;
-    }
-  });
-}
 document.addEventListener("local-selects-changed", (changedData) => {
   updateView();
 });
@@ -104,6 +60,59 @@ function loadAndProcessGlobeData() {
     state.currentDataset = csvData;
     updateView();
   });
+}
+
+function leftArrow() {
+  if (data.colorsValueArray.indexOf(state.chosenTheme) > 0) {
+    state.chosenTheme =
+      data.colors[data.colorsValueArray.indexOf(state.chosenTheme) - 1].value;
+    console.log(state.chosenTheme);
+  }
+  colorChoice.setChoiceByValue(state.chosenTheme);
+
+  updateView();
+}
+function rightArrow() {
+  if (
+    data.colorsValueArray.indexOf(state.chosenTheme) <
+    data.colorsValueArray.length - 1
+  ) {
+    state.chosenTheme =
+      data.colors[data.colorsValueArray.indexOf(state.chosenTheme) + 1].value;
+    console.log(state.chosenTheme);
+  }
+  colorChoice.setChoiceByValue(state.chosenTheme);
+
+  updateView();
+}
+
+function upArrow() {
+  if (data.dataFilesArray.indexOf(state.chosenDataFile) > 0) {
+    state.chosenDataFile =
+      data.mapData[
+        data.dataFilesArray.indexOf(state.chosenDataFile) - 1
+      ].dataFile;
+    console.log(state.chosenDataFile);
+  }
+
+  dataChoice.setChoiceByValue(state.chosenDataFile);
+
+  loadAndProcessGlobeData();
+}
+function downArrow() {
+  if (
+    data.dataFilesArray.indexOf(state.chosenDataFile) <
+    data.dataFilesArray.length - 1
+  ) {
+    state.chosenDataFile =
+      data.mapData[
+        data.dataFilesArray.indexOf(state.chosenDataFile) + 1
+      ].dataFile;
+    console.log(state.chosenDataFile);
+  }
+  dataChoice.setChoiceByValue(state.chosenDataFile);
+
+  loadAndProcessGlobeData();
 }
 
 function populateDropDowns(detail) {
@@ -140,7 +149,7 @@ function populateDropDowns(detail) {
   const colorSelect = document.querySelector("#color_sel");
   const baseMapSelect = document.querySelector("#baseMap_sel");
 
-  const dataChoice = new Choices(dataSelect, {
+  dataChoice = new Choices(dataSelect, {
     choices: dataFilesOptions,
     position: "bottom",
     shouldSort: false,
@@ -148,7 +157,8 @@ function populateDropDowns(detail) {
     searchEnabled: true,
   });
 
-  const colorChoice = new Choices(colorSelect, {
+  console.log(dataChoice);
+  colorChoice = new Choices(colorSelect, {
     choices: themesOptions,
     position: "bottom",
     shouldSort: false,
@@ -162,14 +172,6 @@ function populateDropDowns(detail) {
     itemSelectText: "",
     searchEnabled: true,
   });
-
-  colorSelect.addEventListener(
-    "change",
-    function (event) {
-      console.log(event);
-    },
-    false
-  );
 }
 
 function updateView() {
