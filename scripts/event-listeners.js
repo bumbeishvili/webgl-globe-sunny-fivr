@@ -157,7 +157,8 @@ function toDataURL(url, callback) {
 
 function setNewData() {
   toDataURL(
-    "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+    //"//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+    "./basemaps/white.png",
     function (dataUrl) {
       console.log("RESULT:", dataUrl);
       globe.globeImageUrl(dataUrl);
