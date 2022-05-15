@@ -10,9 +10,28 @@ const state = {
   currentDataset: null,
 };
 
+var dataChoice;
+var colorChoice;
 document.addEventListener("data-loaded", ({ detail }) => {
   populateDropDowns(detail);
   loadAndProcessGlobeData();
+});
+
+document.addEventListener("keydown", function (event) {
+  switch (event.keyCode) {
+    case 37:
+      leftArrow();
+      break;
+    case 38:
+      upArrow();
+      break;
+    case 39:
+      rightArrow();
+      break;
+    case 40:
+      downArrow();
+      break;
+  }
 });
 
 document.addEventListener("local-selects-changed", (changedData) => {
@@ -43,9 +62,63 @@ function loadAndProcessGlobeData() {
   });
 }
 
+function leftArrow() {
+  if (data.colorsValueArray.indexOf(state.chosenTheme) > 0) {
+    state.chosenTheme =
+      data.colors[data.colorsValueArray.indexOf(state.chosenTheme) - 1].value;
+    console.log(state.chosenTheme);
+  }
+  colorChoice.setChoiceByValue(state.chosenTheme);
+
+  updateView();
+}
+function rightArrow() {
+  if (
+    data.colorsValueArray.indexOf(state.chosenTheme) <
+    data.colorsValueArray.length - 1
+  ) {
+    state.chosenTheme =
+      data.colors[data.colorsValueArray.indexOf(state.chosenTheme) + 1].value;
+    console.log(state.chosenTheme);
+  }
+  colorChoice.setChoiceByValue(state.chosenTheme);
+
+  updateView();
+}
+
+function upArrow() {
+  if (data.dataFilesArray.indexOf(state.chosenDataFile) > 0) {
+    state.chosenDataFile =
+      data.mapData[
+        data.dataFilesArray.indexOf(state.chosenDataFile) - 1
+      ].dataFile;
+    console.log(state.chosenDataFile);
+  }
+
+  dataChoice.setChoiceByValue(state.chosenDataFile);
+
+  loadAndProcessGlobeData();
+}
+function downArrow() {
+  if (
+    data.dataFilesArray.indexOf(state.chosenDataFile) <
+    data.dataFilesArray.length - 1
+  ) {
+    state.chosenDataFile =
+      data.mapData[
+        data.dataFilesArray.indexOf(state.chosenDataFile) + 1
+      ].dataFile;
+    console.log(state.chosenDataFile);
+  }
+  dataChoice.setChoiceByValue(state.chosenDataFile);
+
+  loadAndProcessGlobeData();
+}
+
 function populateDropDowns(detail) {
   state.chosenDataFile = detail.mapData[0].dataFile;
-  state.chosenTheme = detail.mapData[0].colors;
+  state.chosenTheme =
+    data.colors[data.colorsNameArray.indexOf(detail.mapData[0].colors)].value;
   state.chosenBaseMap = detail.mapData[0].baseMap;
 
   // Fill DropDowns
@@ -69,71 +142,36 @@ function populateDropDowns(detail) {
       label: d.name,
     };
   });
-  // d3.select('.data-select').html(`options...`)
-  d3.select(".data-select").html(`${dataFilesOptions}`);
-  d3.select(".theme-select").html(`${themesOptions}`);
-  d3.select(".base-map-select").html(`${baseMapOptions}`);
 
   // Add Choices for all selects
-
-  /* 
-       d3.selectAll('.dropdown').each(function()=>{
-           this._choice =  new Choice(this)...
-       })
-    */
-
-  // d3.selectAll(".dropdown-select").each(function () {
-  //   console.log(this);
-  //   this._choice = new Choices(this, {
-  //     choices: dataFilesOptions,
-  //     position: "bottom",
-  //     shouldSort: false,
-  //     itemSelectText: "",
-  //     placeholder: false,
-  //     searchEnabled: false,
-  //   });
-  // });
 
   const dataSelect = document.querySelector("#data_sel");
   const colorSelect = document.querySelector("#color_sel");
   const baseMapSelect = document.querySelector("#baseMap_sel");
 
-  const dataChoice = new Choices(dataSelect, {
+  dataChoice = new Choices(dataSelect, {
     choices: dataFilesOptions,
     position: "bottom",
     shouldSort: false,
     itemSelectText: "",
-    placeholder: true,
-    placeholderValue: "hggh",
-    searchEnabled: false,
+    searchEnabled: true,
   });
 
-  const colorChoice = new Choices(colorSelect, {
+  console.log(dataChoice);
+  colorChoice = new Choices(colorSelect, {
     choices: themesOptions,
     position: "bottom",
     shouldSort: false,
     itemSelectText: "",
-    placeholder: true,
-    placeholderValue: "hj",
-    searchEnabled: false,
+    searchEnabled: true,
   });
   const baseMapChoice = new Choices(baseMapSelect, {
     choices: baseMapOptions,
     position: "bottom",
     shouldSort: false,
     itemSelectText: "",
-    placeholder: true,
-    placeholderValue: "ghg",
-    searchEnabled: false,
+    searchEnabled: true,
   });
-
-  dataSelect.addEventListener(
-    "change",
-    function (event) {
-      console.log(event.detail.value);
-    },
-    false
-  );
 }
 
 function updateView() {
@@ -195,4 +233,8 @@ function setLegend() {
   );
 }
 
-export { state };
+function openLink() {
+  console.log(data);
+  window.open(data.config[0].value, "_blank");
+}
+export { state, openLink };
