@@ -1,6 +1,7 @@
 import { data } from "./main.js";
 import { globe } from "./globe.js";
 import { Legend } from "./legend.d3.js";
+import { setNewData } from "./generateGlobeSurface.js";
 
 const state = {
   chosenDataFile: null,
@@ -116,10 +117,13 @@ function downArrow() {
 }
 
 function populateDropDowns(detail) {
-  state.chosenDataFile = detail.mapData[0].dataFile;
-  state.chosenTheme =
-    data.colors[data.colorsNameArray.indexOf(detail.mapData[0].colors)].value;
-  state.chosenBaseMap = detail.mapData[0].baseMap;
+
+  const file = detail.mapData[0];
+  console.log(file);
+  state.chosenDataFile = file.dataFile;
+  state.chosenTheme = detail.colors.filter(d => d.name == file.colors)[0].value;
+  state.chosenBaseMap = detail.baseMaps.filter(d => d.name == file.baseMap)[0].value;
+
 
   // Fill DropDowns
   const dataFilesOptions = detail.mapData.map((d) => {
@@ -179,47 +183,8 @@ function updateView() {
   setLegend();
 }
 
-function toDataURL(url, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.onload = function () {
-    var reader = new FileReader();
-    reader.onloadend = function () {
-      callback(reader.result);
-    };
-    reader.readAsDataURL(xhr.response);
-  };
-  xhr.open("GET", url);
-  xhr.responseType = "blob";
-  xhr.send();
-}
 
-function setNewData() {
-  toDataURL(
-    //"//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
-    "./basemaps/white.png",
-    function (dataUrl) {
-      console.log("RESULT:", dataUrl);
-      globe.globeImageUrl(dataUrl);
-    }
-  );
-  // const image = new Image();
-  // image.src = "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg";
-  // image.onload = () => {
-  //     globe.globeImageUrl(image);
-  // }
-  // console.log('setting data', state)
 
-  // globe.globeImageUrl(
-  //     "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-  // )
-  // It's on me to implement this function
-
-  // Generating BASE 64 IMG
-
-  // Updating Globe
-
-  // Setting state extent ...
-}
 
 function setLegend() {
   console.log("setting legend");
