@@ -49,33 +49,21 @@ export function setNewData() {
       }
     };
   }
+
   make_base("./basemaps/" + state.chosenBaseMap);
   // make_base('./basemaps/white.png')
 
   function addCanvasToGlobe() {
     const base64Img = canvas.toDataURL("image/jpeg");
-    console.log({ base64Img });
     globe.globeImageUrl(base64Img);
   }
 
   function drawData() {
-    console.log({ state });
-
-    const colors = state.chosenTheme
-      .replace("[", "")
-      .replace("]", "")
-      .replaceAll('"', "")
-      .split(",");
-    console.log(colors);
-
-    state.chosenThemeArray = colors;
-
     const customColorInterpolator = d3
       .scaleLinear()
       .domain(state.chosenThemeArray.map((d, i, arr) => i / (arr.length - 1)))
       .range(state.chosenThemeArray);
 
-    //  console.log(customColorInterpolator(0.5));
     var data = new Array(65160).fill().map((d) => 0);
 
     const scale = d3

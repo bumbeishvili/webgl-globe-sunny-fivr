@@ -10,9 +10,10 @@ const state = {
   dataExtent: [0, 100],
   currentDataset: null,
 };
-
 var dataChoice;
 var colorChoice;
+var baseMapChoice;
+
 document.addEventListener("data-loaded", ({ detail }) => {
   populateDropDowns(detail);
   loadAndProcessGlobeData();
@@ -41,24 +42,47 @@ document.addEventListener("local-selects-changed", (changedData) => {
 
 d3.select(".data-select").on("change", () => {
   const chosenDataFile = d3.select(".data-select").node().value;
+
   state.chosenDataFile = chosenDataFile;
+
+  let dataIndex = data.dataFilesArray.indexOf(state.chosenDataFile);
+  state.chosenBaseMap = data.baseMaps.filter(
+    (d) => d.name == data.mapData[dataIndex].baseMap
+  )[0].value;
+
+  baseMapChoice.setChoiceByValue(state.chosenBaseMap);
+
+  state.chosenTheme = data.colors.filter(
+    (d) => d.name == data.mapData[dataIndex].colors
+  )[0].value;
+
+  colorChoice.setChoiceByValue(state.chosenTheme);
+
   loadAndProcessGlobeData();
 });
 
 d3.select(".theme-select").on("change", () => {
   state.chosenTheme = d3.select(".theme-select").node().value;
+  console.log(state.chosenTheme);
+  let colors = state.chosenTheme
+    .replace("[", "")
+    .replace("]", "")
+    .replaceAll('"', "")
+    .split(",");
+
+  state.chosenThemeArray = colors;
+
   updateView();
 });
 
 d3.select(".base-map-select").on("change", () => {
   state.chosenBaseMap = d3.select(".base-map-select").node().value;
-  console.log(state.chosenBaseMap);
   updateView();
 });
 
 function loadAndProcessGlobeData() {
   d3.csv("/data/" + state.chosenDataFile).then((csvData) => {
-    state.currentDataset = csvData;
+    state.currentDataset = csvData.filter((d) => d != "-9.99e+08");
     updateView();
   });
 }
@@ -67,7 +91,6 @@ function leftArrow() {
   if (data.colorsValueArray.indexOf(state.chosenTheme) > 0) {
     state.chosenTheme =
       data.colors[data.colorsValueArray.indexOf(state.chosenTheme) - 1].value;
-    console.log(state.chosenTheme);
   }
   colorChoice.setChoiceByValue(state.chosenTheme);
 
@@ -80,7 +103,6 @@ function rightArrow() {
   ) {
     state.chosenTheme =
       data.colors[data.colorsValueArray.indexOf(state.chosenTheme) + 1].value;
-    console.log(state.chosenTheme);
   }
   colorChoice.setChoiceByValue(state.chosenTheme);
 
@@ -93,9 +115,19 @@ function upArrow() {
       data.mapData[
         data.dataFilesArray.indexOf(state.chosenDataFile) - 1
       ].dataFile;
-    console.log(state.chosenDataFile);
   }
 
+  let dataIndex = data.dataFilesArray.indexOf(state.chosenDataFile);
+  state.chosenBaseMap = data.baseMaps.filter(
+    (d) => d.name == data.mapData[dataIndex].baseMap
+  )[0].value;
+  state.chosenTheme = data.colors.filter(
+    (d) => d.name == data.mapData[dataIndex].colors
+  )[0].value;
+
+  colorChoice.setChoiceByValue(state.chosenTheme);
+
+  baseMapChoice.setChoiceByValue(state.chosenBaseMap);
   dataChoice.setChoiceByValue(state.chosenDataFile);
 
   loadAndProcessGlobeData();
@@ -109,16 +141,27 @@ function downArrow() {
       data.mapData[
         data.dataFilesArray.indexOf(state.chosenDataFile) + 1
       ].dataFile;
-    console.log(state.chosenDataFile);
   }
+
+  let dataIndex = data.dataFilesArray.indexOf(state.chosenDataFile);
+  state.chosenBaseMap = data.baseMaps.filter(
+    (d) => d.name == data.mapData[dataIndex].baseMap
+  )[0].value;
+  state.chosenTheme = data.colors.filter(
+    (d) => d.name == data.mapData[dataIndex].colors
+  )[0].value;
+
+  colorChoice.setChoiceByValue(state.chosenTheme);
+
+  baseMapChoice.setChoiceByValue(state.chosenBaseMap);
   dataChoice.setChoiceByValue(state.chosenDataFile);
 
   loadAndProcessGlobeData();
 }
 
 function populateDropDowns(detail) {
+  console.log({ detail });
   const file = detail.mapData[0];
-  console.log(file);
   state.chosenDataFile = file.dataFile;
   state.chosenTheme = detail.colors.filter(
     (d) => d.name == file.colors
@@ -126,6 +169,19 @@ function populateDropDowns(detail) {
   state.chosenBaseMap = detail.baseMaps.filter(
     (d) => d.name == file.baseMap
   )[0].value;
+
+  let colors = state.chosenTheme
+    .replace("[", "")
+    .replace("]", "")
+    .replaceAll('"', "")
+    .split(",");
+
+  state.chosenThemeArray = colors;
+
+  d3.csv("/data/" + state.chosenDataFile).then((csvData) => {
+    state.currentDataset = csvData.filter((d) => d != "-9.99e+08");
+    // updateView();
+  });
 
   // Fill DropDowns
   const dataFilesOptions = detail.mapData.map((d) => {
@@ -163,7 +219,6 @@ function populateDropDowns(detail) {
     searchEnabled: true,
   });
 
-  console.log(dataChoice);
   colorChoice = new Choices(colorSelect, {
     choices: themesOptions,
     position: "bottom",
@@ -171,15 +226,16 @@ function populateDropDowns(detail) {
     itemSelectText: "",
     searchEnabled: true,
   });
-  const baseMapChoice = new Choices(baseMapSelect, {
+  baseMapChoice = new Choices(baseMapSelect, {
     choices: baseMapOptions,
     position: "bottom",
     shouldSort: false,
     itemSelectText: "",
     searchEnabled: true,
   });
-}
 
+  baseMapChoice.setChoiceByValue(state.chosenBaseMap);
+}
 function updateView() {
   setNewData();
   setLegend();
@@ -188,17 +244,32 @@ function updateView() {
 function setLegend() {
   console.log("setting legend");
   Legend(
-    d3.scaleLinear().domain([0, 50, 100]).range(["red", "blue", "green"]),
+    d3
+      .scaleLinear()
+      .domain([
+        d3.min(state.currentDataset, (d) => d.Value),
+        d3.max(state.currentDataset, (d) => d.Value),
+      ])
+      .range(state.chosenThemeArray),
     {
-      title: "Annual Potential Evaporation",
+      title:
+        data.mapData[data.dataFilesArray.indexOf(state.chosenDataFile)]
+          .dataName,
       tickSize: 0,
       container: d3.select(".color-legend-container"),
     }
   );
+  //(
+  //   d3.scaleLinear().domain([0, 50, 100]).range(["red", "blue", "green"]),
+  //   {
+  //     title: "Annual Potential Evaporation",
+  //     tickSize: 0,
+  //     container: d3.select(".color-legend-container"),
+  //   }
+  // );
 }
 
 function openLink() {
-  console.log(data);
   window.open(data.config[0].value, "_blank");
 }
 export { state, openLink };
