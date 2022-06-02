@@ -27,6 +27,7 @@ Promise.all([
   data.colors = colors;
   data.baseMaps = baseMaps;
 
+  console.log(colors[13].value);
   mapData.forEach((element) => {
     data.dataFilesArray.push(element.dataFile);
   });
@@ -44,3 +45,5 @@ Promise.all([
 });
 
 export { data };
+
+//schemes.oleron;

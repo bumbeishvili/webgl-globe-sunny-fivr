@@ -2,111 +2,177 @@ import { globe } from "./globe.js";
 import { state } from "./event-listeners.js";
 
 const canvas = document.createElement("canvas");
-const d3Canvas = d3.select(canvas).attr('width', '4096').attr('height', '2048');
-const context = canvas.getContext('2d');
-document.body.insertBefore(canvas, d3.select('.filters').node());
-
+const d3Canvas = d3.select(canvas).attr("width", "4096").attr("height", "2048");
+const context = canvas.getContext("2d");
+document.body.insertBefore(canvas, d3.select(".filters").node());
 
 export function setNewData() {
+  console.log("setting new configuration", state);
 
-    console.log('setting new configuration', state)
+  // toDataURL(
+  //     //"//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+  //     "./basemaps/white.png",
+  //     function (base64Url) {
+  //         console.log("RESULT:", { state, base64Url });
+  //         globe.globeImageUrl(base64Url);
+  //     }
+  // );
 
-    // toDataURL(
-    //     //"//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
-    //     "./basemaps/white.png",
-    //     function (base64Url) {
-    //         console.log("RESULT:", { state, base64Url });
-    //         globe.globeImageUrl(base64Url);
-    //     }
+  // const image = new Image();
+  // image.src = "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg";
+  // image.onload = () => {
+  //     globe.globeImageUrl(image);
+  // }
+  // console.log('setting data', state)
+
+  // globe.globeImageUrl(
+  //     "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+  // )
+  // It's on me to implement this function
+
+  // Generating BASE 64 IMG
+
+  // Updating Globe
+
+  // Setting state extent ...
+
+  function make_base(imageUrl) {
+    const base_image = new Image();
+    base_image.src = imageUrl;
+    base_image.onload = function () {
+      context.drawImage(base_image, 0, 0);
+
+      // Download data and then
+      {
+        drawData();
+        addCanvasToGlobe();
+      }
+    };
+  }
+  make_base("./basemaps/" + state.chosenBaseMap);
+  // make_base('./basemaps/white.png')
+
+  function addCanvasToGlobe() {
+    const base64Img = canvas.toDataURL("image/jpeg");
+    console.log({ base64Img });
+    globe.globeImageUrl(base64Img);
+  }
+
+  function drawData() {
+    console.log({ state });
+
+    const colors = state.chosenTheme
+      .replace("[", "")
+      .replace("]", "")
+      .replaceAll('"', "")
+      .split(",");
+    console.log(colors);
+
+    state.chosenThemeArray = colors;
+
+    const customColorInterpolator = d3
+      .scaleLinear()
+      .domain(state.chosenThemeArray.map((d, i, arr) => i / (arr.length - 1)))
+      .range(state.chosenThemeArray);
+
+    //  console.log(customColorInterpolator(0.5));
+    var data = new Array(65160).fill().map((d) => 0);
+
+    const scale = d3
+      .scaleLinear()
+      .domain([
+        d3.min(
+          state.currentDataset.filter((d) => d.Value > 0.000001),
+          (d) => d.Value
+        ),
+        d3.max(
+          state.currentDataset.filter((d) => d.Value > 0.000001),
+          (d) => d.Value
+        ),
+      ])
+      .range([0, 1]);
+
+    // const normalizedProjectData = JSON.parse(
+    //   JSON.stringify(state.currentDataset)
     // );
+    var normalizedProjectData = state.currentDataset;
+    normalizedProjectData.forEach((d) => {
+      d.Value = scale(d.Value);
+    });
 
-
-
-    // const image = new Image();
-    // image.src = "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg";
-    // image.onload = () => {
-    //     globe.globeImageUrl(image);
-    // }
-    // console.log('setting data', state)
-
-    // globe.globeImageUrl(
-    //     "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-    // )
-    // It's on me to implement this function
-
-    // Generating BASE 64 IMG
-
-    // Updating Globe
-
-    // Setting state extent ...
-
-    function make_base(imageUrl) {
-        const base_image = new Image();
-        base_image.src = imageUrl;
-        base_image.onload = function () {
-            context.drawImage(base_image, 0, 0);
-
-            // Download data and then
-            {
-                drawData()
-                addCanvasToGlobe();
-            }
-
+    normalizedProjectData.forEach((d) => {
+      var latLevel; //from 0 to 180
+      var lonLevel; //from 0 to 359
+      if (
+        parseFloat(d.LON) - Math.floor(parseFloat(d.LON)) == 0 &&
+        parseFloat(d.LAT) - Math.floor(parseFloat(d.LAT)) == 0.75
+      ) {
+        if (parseFloat(d.LAT) > 0) {
+          latLevel = 90 - parseFloat(d.LAT);
+        } else {
+          latLevel = 90 + Math.abs(parseFloat(d.LAT));
         }
-    }
-    make_base('./basemaps/' + state.chosenBaseMap)
-    // make_base('./basemaps/white.png')
+        if (parseFloat(d.LON) < 0) {
+          lonLevel = 360 - Math.abs(parseFloat(d.LON));
+        } else {
+          lonLevel = parseFloat(d.LON);
+        }
+        let index = latLevel * 360 + lonLevel; //from 0 to 65159
+        data[index] = parseFloat(d.Value);
+      }
+    });
 
-    function addCanvasToGlobe() {
-        const base64Img = canvas.toDataURL("image/jpeg");
-        console.log({ base64Img })
-        globe.globeImageUrl(base64Img);
-    }
+    const width = 4096;
+    const height = 2048;
 
-    function drawData() {
+    const project = d3
+      .geoEquirectangular()
+      .precision(0.1)
+      .fitSize([width, height], { type: "Sphere" })
+      .translate([width / 2, height / 2]);
 
+    let eachBarGroupWidth = 20;
+    let eachBarHeight = 10;
+    normalizedProjectData.forEach((item, i, arr) => {
+      context.fillStyle = customColorInterpolator(item.Value);
+      const pos = project([item.LON, item.LAT]);
 
-        const graticule = d3.geoGraticule10();
-        const lineWidth = 3;
-        const graticuleColor = "blue";
-        const width = 4096;
-        const height = 2048;
+      if (item.Value < -10) {
+        context.fillStyle = "#000000";
+      }
 
-        const project = d3
-            .geoEquirectangular()
-            .precision(0.1)
-            .fitSize([width, height], { type: "Sphere" })
-            .translate([width / 2, height / 2]);
+      context.fillRect(
+        pos[0], // x
+        pos[1], // y
+        eachBarGroupWidth, // width
+        eachBarHeight // height
+      );
+    });
 
+    // const path = d3.geoPath(project, context).pointRadius(1.5);
 
-        const path = d3.geoPath(project, context).pointRadius(1.5);
+    // // context.fillStyle = "#ff0000";
+    // // context.strokeStyle = '#ff0000'
+    // // context.fillRect(0, 0, width, height);
 
-        // context.fillStyle = "#ff0000";
-        // context.strokeStyle = '#ff0000'
-        // context.fillRect(0, 0, width, height);
-
-        context.beginPath();
-        path(graticule);
-        context.lineWidth = lineWidth;
-        context.strokeStyle = graticuleColor;
-        context.stroke();
-
-    }
-
-
+    // context.beginPath();
+    // path(graticule);
+    //  context.lineWidth = lineWidth;
+    // context.strokeStyle = graticuleColor;
+    // context.stroke();
+  }
 }
 
-
 function toDataURL(url, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-        var reader = new FileReader();
-        reader.onloadend = function () {
-            callback(reader.result);
-        };
-        reader.readAsDataURL(xhr.response);
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function () {
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      callback(reader.result);
     };
-    xhr.open("GET", url);
-    xhr.responseType = "blob";
-    xhr.send();
+    reader.readAsDataURL(xhr.response);
+  };
+  xhr.open("GET", url);
+  xhr.responseType = "blob";
+  xhr.send();
 }

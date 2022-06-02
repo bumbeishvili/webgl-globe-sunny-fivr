@@ -117,13 +117,15 @@ function downArrow() {
 }
 
 function populateDropDowns(detail) {
-
   const file = detail.mapData[0];
   console.log(file);
   state.chosenDataFile = file.dataFile;
-  state.chosenTheme = detail.colors.filter(d => d.name == file.colors)[0].value;
-  state.chosenBaseMap = detail.baseMaps.filter(d => d.name == file.baseMap)[0].value;
-
+  state.chosenTheme = detail.colors.filter(
+    (d) => d.name == file.colors
+  )[0].value;
+  state.chosenBaseMap = detail.baseMaps.filter(
+    (d) => d.name == file.baseMap
+  )[0].value;
 
   // Fill DropDowns
   const dataFilesOptions = detail.mapData.map((d) => {
@@ -182,9 +184,6 @@ function updateView() {
   setNewData();
   setLegend();
 }
-
-
-
 
 function setLegend() {
   console.log("setting legend");
