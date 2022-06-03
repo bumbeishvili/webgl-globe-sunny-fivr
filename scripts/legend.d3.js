@@ -167,8 +167,7 @@ function Legend(
       d3
         .axisBottom(x)
         .ticks(ticks, typeof tickFormat === "string" ? tickFormat : undefined)
-        // .tickFormat(typeof tickFormat === "function" ? tickFormat : undefined)
-        .tickFormat(d3.format(".2s"))
+        .tickFormat(typeof tickFormat === "function" ? tickFormat : undefined)
 
         .tickSize(tickSize)
         .tickValues(tickValues)

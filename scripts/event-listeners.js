@@ -56,6 +56,8 @@ d3.select(".data-select").on("change", () => {
     (d) => d.name == data.mapData[dataIndex].colors
   )[0].value;
 
+  updateColorsArray();
+
   colorChoice.setChoiceByValue(state.chosenTheme);
 
   loadAndProcessGlobeData();
@@ -63,14 +65,8 @@ d3.select(".data-select").on("change", () => {
 
 d3.select(".theme-select").on("change", () => {
   state.chosenTheme = d3.select(".theme-select").node().value;
-  console.log(state.chosenTheme);
-  let colors = state.chosenTheme
-    .replace("[", "")
-    .replace("]", "")
-    .replaceAll('"', "")
-    .split(",");
 
-  state.chosenThemeArray = colors;
+  updateColorsArray();
 
   updateView();
 });
@@ -82,7 +78,10 @@ d3.select(".base-map-select").on("change", () => {
 
 function loadAndProcessGlobeData() {
   d3.csv("/data/" + state.chosenDataFile).then((csvData) => {
-    state.currentDataset = csvData.filter((d) => d != "-9.99e+08");
+    console.log(csvData);
+    state.currentDataset = csvData.filter(
+      (d) => d.Value !== "-9.99e+08" && d.Value !== "-9.99E+08"
+    );
     updateView();
   });
 }
@@ -170,16 +169,13 @@ function populateDropDowns(detail) {
     (d) => d.name == file.baseMap
   )[0].value;
 
-  let colors = state.chosenTheme
-    .replace("[", "")
-    .replace("]", "")
-    .replaceAll('"', "")
-    .split(",");
-
-  state.chosenThemeArray = colors;
+  updateColorsArray();
 
   d3.csv("/data/" + state.chosenDataFile).then((csvData) => {
-    state.currentDataset = csvData.filter((d) => d != "-9.99e+08");
+    console.log(csvData);
+    state.currentDataset = csvData.filter(
+      (d) => d.Value !== "-9.99e+08" && d.Value !== "-9.99E+08"
+    );
     // updateView();
   });
 
@@ -243,6 +239,7 @@ function updateView() {
 
 function setLegend() {
   console.log("setting legend");
+  console.log(state.currentDataset);
   Legend(
     d3
       .scaleLinear()
@@ -273,3 +270,13 @@ function openLink() {
   window.open(data.config[0].value, "_blank");
 }
 export { state, openLink };
+
+function updateColorsArray() {
+  let colors = state.chosenTheme
+    .replace("[", "")
+    .replace("]", "")
+    .replaceAll('"', "")
+    .split(",");
+
+  state.chosenThemeArray = colors;
+}

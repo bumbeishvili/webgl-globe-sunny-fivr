@@ -64,7 +64,7 @@ export function setNewData() {
       .domain(state.chosenThemeArray.map((d, i, arr) => i / (arr.length - 1)))
       .range(state.chosenThemeArray);
 
-    var data = new Array(65160).fill().map((d) => 0);
+    var data = new Array(/*65160 * 4 */ 65160).fill().map((d) => 0);
 
     const scale = d3
       .scaleLinear()
@@ -80,10 +80,10 @@ export function setNewData() {
       ])
       .range([0, 1]);
 
-    // const normalizedProjectData = JSON.parse(
-    //   JSON.stringify(state.currentDataset)
-    // );
-    var normalizedProjectData = state.currentDataset;
+    const normalizedProjectData = JSON.parse(
+      JSON.stringify(state.currentDataset)
+    );
+    // var normalizedProjectData = state.currentDataset;
     normalizedProjectData.forEach((d) => {
       d.Value = scale(d.Value);
     });
@@ -93,7 +93,7 @@ export function setNewData() {
       var lonLevel; //from 0 to 359
       if (
         parseFloat(d.LON) - Math.floor(parseFloat(d.LON)) == 0 &&
-        parseFloat(d.LAT) - Math.floor(parseFloat(d.LAT)) == 0.75
+        parseFloat(d.LAT) - Math.floor(parseFloat(d.LAT)) == 0.25
       ) {
         if (parseFloat(d.LAT) > 0) {
           latLevel = 90 - parseFloat(d.LAT);
@@ -105,7 +105,7 @@ export function setNewData() {
         } else {
           lonLevel = parseFloat(d.LON);
         }
-        let index = latLevel * 360 + lonLevel; //from 0 to 65159
+        let index = latLevel * 360 + lonLevel;
         data[index] = parseFloat(d.Value);
       }
     });
@@ -136,18 +136,6 @@ export function setNewData() {
         eachBarHeight // height
       );
     });
-
-    // const path = d3.geoPath(project, context).pointRadius(1.5);
-
-    // // context.fillStyle = "#ff0000";
-    // // context.strokeStyle = '#ff0000'
-    // // context.fillRect(0, 0, width, height);
-
-    // context.beginPath();
-    // path(graticule);
-    //  context.lineWidth = lineWidth;
-    // context.strokeStyle = graticuleColor;
-    // context.stroke();
   }
 }
 
