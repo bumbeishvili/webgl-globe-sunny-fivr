@@ -15,6 +15,7 @@ var colorChoice;
 var baseMapChoice;
 
 document.addEventListener("data-loaded", ({ detail }) => {
+  globe.globeMaterial().displacementScale = +data.config.filter(d => d.name == 'displacement')[0].value;
   populateDropDowns(detail);
   loadAndProcessGlobeData();
 });
@@ -52,6 +53,8 @@ d3.select(".data-select").on("change", () => {
 
   baseMapChoice.setChoiceByValue(state.chosenBaseMap);
 
+  setBasemapClass();
+
   state.chosenTheme = data.colors.filter(
     (d) => d.name == data.mapData[dataIndex].colors
   )[0].value;
@@ -73,15 +76,19 @@ d3.select(".theme-select").on("change", () => {
 
 d3.select(".base-map-select").on("change", () => {
   state.chosenBaseMap = d3.select(".base-map-select").node().value;
+  setBasemapClass();
   updateView();
 });
 
 function loadAndProcessGlobeData() {
   d3.csv("/data/" + state.chosenDataFile).then((csvData) => {
-    console.log(csvData);
-    state.currentDataset = csvData.filter(
-      (d) => d.Value !== "-9.99e+08" && d.Value !== "-9.99E+08"
-    );
+    state.currentDataset = csvData;
+    state.currentDataset.forEach((d) => {
+      if (d.Value == "-9.99e+08" || d.Value == "-9.99E+08" || d.Value == "9.99E+08" || d.Value == "9.99E+08") {
+        d.anomaly = 'true';
+      }
+    })
+    state.currentDataset.forEach(d3.autoType)
     updateView();
   });
 }
@@ -92,7 +99,7 @@ function leftArrow() {
       data.colors[data.colorsValueArray.indexOf(state.chosenTheme) - 1].value;
   }
   colorChoice.setChoiceByValue(state.chosenTheme);
-
+  updateColorsArray();
   updateView();
 }
 function rightArrow() {
@@ -104,7 +111,7 @@ function rightArrow() {
       data.colors[data.colorsValueArray.indexOf(state.chosenTheme) + 1].value;
   }
   colorChoice.setChoiceByValue(state.chosenTheme);
-
+  updateColorsArray();
   updateView();
 }
 
@@ -120,6 +127,8 @@ function upArrow() {
   state.chosenBaseMap = data.baseMaps.filter(
     (d) => d.name == data.mapData[dataIndex].baseMap
   )[0].value;
+  setBasemapClass();
+
   state.chosenTheme = data.colors.filter(
     (d) => d.name == data.mapData[dataIndex].colors
   )[0].value;
@@ -146,6 +155,8 @@ function downArrow() {
   state.chosenBaseMap = data.baseMaps.filter(
     (d) => d.name == data.mapData[dataIndex].baseMap
   )[0].value;
+  setBasemapClass();
+
   state.chosenTheme = data.colors.filter(
     (d) => d.name == data.mapData[dataIndex].colors
   )[0].value;
@@ -158,8 +169,12 @@ function downArrow() {
   loadAndProcessGlobeData();
 }
 
+function setBasemapClass() {
+  const theme = data.baseMaps.filter(d => d.value == state.chosenBaseMap)[0].name;
+  d3.select('body').attr('class', theme)
+}
+
 function populateDropDowns(detail) {
-  console.log({ detail });
   const file = detail.mapData[0];
   state.chosenDataFile = file.dataFile;
   state.chosenTheme = detail.colors.filter(
@@ -168,16 +183,9 @@ function populateDropDowns(detail) {
   state.chosenBaseMap = detail.baseMaps.filter(
     (d) => d.name == file.baseMap
   )[0].value;
+  setBasemapClass();
 
   updateColorsArray();
-
-  d3.csv("/data/" + state.chosenDataFile).then((csvData) => {
-    console.log(csvData);
-    state.currentDataset = csvData.filter(
-      (d) => d.Value !== "-9.99e+08" && d.Value !== "-9.99E+08"
-    );
-    // updateView();
-  });
 
   // Fill DropDowns
   const dataFilesOptions = detail.mapData.map((d) => {
@@ -190,7 +198,7 @@ function populateDropDowns(detail) {
   const themesOptions = detail.colors.map((d) => {
     return {
       value: d.value,
-      label: d.name,
+      label: `<div style="display:inline-block"> ${JSON.parse(d.value).map(v => `<div style="background-color:${v};display:inline-block;width:8px;height:10px;"></div>`).join('')} </div> &nbsp;` + d.name,
     };
   });
 
@@ -217,6 +225,7 @@ function populateDropDowns(detail) {
 
   colorChoice = new Choices(colorSelect, {
     choices: themesOptions,
+    allowHTML: true,
     position: "bottom",
     shouldSort: false,
     itemSelectText: "",
@@ -233,20 +242,22 @@ function populateDropDowns(detail) {
   baseMapChoice.setChoiceByValue(state.chosenBaseMap);
 }
 function updateView() {
+  globe.backgroundImageUrl(
+    d3.select("body").attr("class") == 'Light' ? './basemaps/light.png' : "//unpkg.com/three-globe/example/img/night-sky.png")
   setNewData();
   setLegend();
 }
 
 function setLegend() {
-  console.log("setting legend");
-  console.log(state.currentDataset);
+  const min = d3.min(state.currentDataset.filter(d => !d.anomaly), (d) => d.Value);
+  const max = d3.max(state.currentDataset.filter(d => !d.anomaly), (d) => d.Value);
+  const domainValues = state.chosenThemeArray.map((d, i, arr) => {
+    return min + (max - min) * i / (arr.length - 1);
+  })
   Legend(
     d3
       .scaleLinear()
-      .domain([
-        d3.min(state.currentDataset, (d) => d.Value),
-        d3.max(state.currentDataset, (d) => d.Value),
-      ])
+      .domain(domainValues)
       .range(state.chosenThemeArray),
     {
       title:
@@ -256,18 +267,12 @@ function setLegend() {
       container: d3.select(".color-legend-container"),
     }
   );
-  //(
-  //   d3.scaleLinear().domain([0, 50, 100]).range(["red", "blue", "green"]),
-  //   {
-  //     title: "Annual Potential Evaporation",
-  //     tickSize: 0,
-  //     container: d3.select(".color-legend-container"),
-  //   }
-  // );
+
 }
 
-function openLink() {
-  window.open(data.config[0].value, "_blank");
+function openLink(e) {
+  const query = `lat=${e.lat}&lon=${e.lng}`
+  window.open(data.config[0].value + query, "_blank");
 }
 export { state, openLink };
 
