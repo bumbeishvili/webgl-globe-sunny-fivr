@@ -81,6 +81,7 @@ d3.select(".base-map-select").on("change", () => {
 });
 
 function loadAndProcessGlobeData() {
+  d3.select('.loader-wrapper').style('display', 'block');
   d3.csv("./data/" + state.chosenDataFile).then((csvData) => {
     state.currentDataset = csvData;
     state.currentDataset.forEach((d) => {
@@ -90,6 +91,7 @@ function loadAndProcessGlobeData() {
     })
     state.currentDataset.forEach(d3.autoType)
     updateView();
+    d3.select('.loader-wrapper').style('display', 'none');
   });
 }
 
