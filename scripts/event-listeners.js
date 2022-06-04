@@ -81,7 +81,7 @@ d3.select(".base-map-select").on("change", () => {
 });
 
 function loadAndProcessGlobeData() {
-  d3.csv("/data/" + state.chosenDataFile).then((csvData) => {
+  d3.csv("./data/" + state.chosenDataFile).then((csvData) => {
     state.currentDataset = csvData;
     state.currentDataset.forEach((d) => {
       if (d.Value == "-9.99e+08" || d.Value == "-9.99E+08" || d.Value == "9.99E+08" || d.Value == "9.99E+08") {
