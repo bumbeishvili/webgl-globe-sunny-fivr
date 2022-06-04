@@ -274,7 +274,12 @@ function setLegend() {
 
 function openLink(e) {
   const query = `lat=${e.lat}&lon=${e.lng}`
-  window.open(data.config[0].value + query, "_blank");
+  const configUrl = data.config.filter(d => d.type == 'redirect')[0];
+  console.log('not active',configUrl)
+  if (+configUrl.active) {
+    window.open(configUrl.value + query, "_blank");
+  }
+
 }
 export { state, openLink };
 
