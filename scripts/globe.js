@@ -8,6 +8,7 @@ const globe = Globe()
   );
 
 initDisplacement()
+initControls();
 
 function initDisplacement() {
   const material = globe.globeMaterial();
@@ -17,6 +18,19 @@ function initDisplacement() {
     "//unpkg.com/three-globe/example/img/earth-topology.png",
   );
   material.displacementMap = displacementTexture;
+}
+
+
+
+function initControls() {
+  const controls = globe.controls();
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 1;
+
+  // stop autorotate after the first interaction
+  controls.addEventListener("start", function () {
+    controls.autoRotate = false;
+  });
 }
 
 export { globe };
