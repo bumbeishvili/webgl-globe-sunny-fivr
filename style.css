@@ -1,3 +1,7 @@
+.ocean-color-label {
+  color: lightblue;
+}
+
 .color-legend-container {
   width: 330px;
   height: 31px;
@@ -190,6 +194,10 @@ body {
   background-color: #c8c8c8 !important;
 }
 
+.light .ocean-color-label {
+  color: #172033;
+}
+
 
 .light .choices__input {
   background-color: #f5f5f5 !important;
@@ -205,15 +213,15 @@ body {
   background: #c8c8c8;
 }
 
-.light  .choices__list--dropdown .choices__item--selectable.is-highlighted {
+.light .choices__list--dropdown .choices__item--selectable.is-highlighted {
   background-color: #c8c8c8 !important;
 }
 
-.light  .choices__list--dropdown {
+.light .choices__list--dropdown {
   background-color: #c8c8c8 !important;
 }
 
 
-.light  ::-webkit-scrollbar-track {
+.light ::-webkit-scrollbar-track {
   background: #f5f5f5;
 }

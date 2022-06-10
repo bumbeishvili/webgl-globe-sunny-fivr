@@ -41,6 +41,11 @@ document.addEventListener("local-selects-changed", (changedData) => {
   updateView();
 });
 
+
+d3.select('.ocean-color-input').on('change', function () {
+  updateView()
+})
+
 d3.select(".data-select").on("change", () => {
   const chosenDataFile = d3.select(".data-select").node().value;
 
@@ -58,11 +63,9 @@ d3.select(".data-select").on("change", () => {
   state.chosenTheme = data.colors.filter(
     (d) => d.name == data.mapData[dataIndex].colors
   )[0].value;
-
-  updateColorsArray();
-
   colorChoice.setChoiceByValue(state.chosenTheme);
 
+  updateColorsArray();
   loadAndProcessGlobeData();
 });
 
@@ -275,7 +278,7 @@ function setLegend() {
 function openLink(e) {
   const query = `lat=${e.lat}&lon=${e.lng}`
   const configUrl = data.config.filter(d => d.type == 'redirect')[0];
-  console.log('not active',configUrl)
+  console.log('not active', configUrl)
   if (+configUrl.active) {
     window.open(configUrl.value + query, "_blank");
   }
