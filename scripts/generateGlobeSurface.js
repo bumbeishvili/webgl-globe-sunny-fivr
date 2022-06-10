@@ -84,7 +84,7 @@ export function setNewData() {
     const oceanEnabled = d3.select('.ocean-color-input').node().checked;
     console.log('state', state)
     const oceanColor = dataInitial.mapData[dataInitial.dataFilesArray.indexOf(state.chosenDataFile)].oceanColor;
-    debugger;
+    
     state.currentDataset.forEach((item, i, arr) => {
       context.fillStyle = color(item.Value);
       const pos = project([item.LON, item.LAT]) //.map(Math.round);
